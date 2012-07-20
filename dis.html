@@ -322,28 +322,33 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     function loadBinary(jsonp) {
       console.log('Binary loaded');
       binary = window.atob(jsonp.data.content.replace(/\s/g,''));
+      log('Binary file loaded.\n');
+      var elem = document.getElementById('dump');
+      elem.innerHTML = "<pre>"+dis(binary).join("\n")+"</pre>";  
     }
     
     function loadArchitecture(jsonp) {
       console.log('Architecture loaded');
       architecture = window.atob(jsonp.data.content.replace(/\s/g,''));
+      var e = architecture;
+      log('Architecture file loaded.\n');
+      processArch(e);
+      
+      for(var i=0; i<arch.instructions.length; i++){
+        var inst = arch.instructions[i];
+        if ((instPrepare(inst) & 7) != 0) {
+          log('Warning: instruction found that is not an exact multiple of bytes.');
+        }
+      }
     }
   </script>
-  
-  <!--
-  https://api.github.com/repos/raspberrypi/firmware/git/trees/0c1c1012e33716f153d88266e5fc5d7a4415505c
-  -->
-  
-  <script src='https://api.github.com/repos/raspberrypi/firmware/git/blobs/d6bbd12c3becb0517819c5afe138cffb62ad7d95?callback=loadBinary'>
-  </script>
-  
-  <!--
-  -->
   
   <script src='https://api.github.com/repos/hermanhermitage/videocoreiv/contents/videocoreiv.arch?callback=loadArchitecture'>
   </script>
   
-  
+  <script src='https://api.github.com/repos/raspberrypi/firmware/git/blobs/d6bbd12c3becb0517819c5afe138cffb62ad7d95?callback=loadBinary'>
+  </script>
+    
   <div id='rules'>
 <textarea rows="2" cols="20">
  (instructions)
