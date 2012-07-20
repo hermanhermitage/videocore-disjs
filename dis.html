@@ -317,8 +317,8 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     }
 
     function loadBinary(jsonp) {
-      var meta = response.meta
-      var data = response.data
+      var meta = jsonp.meta
+      var data = jsonp.data
       console.log(meta)
       console.log(data)  	
     }
