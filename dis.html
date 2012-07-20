@@ -321,12 +321,12 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     
     function loadBinary(jsonp) {
       console.log('Binary loaded');
-      binary = window.atob(jsonp.data.content);
+      binary = jsonp.data.content;
     }
     
     function loadArchitecture(jsonp) {
       console.log('Architecture loaded');
-      architecture = window.atob(jsonp.data.content);
+      architecture = jsonp.data.content;
     }
   </script>
   
