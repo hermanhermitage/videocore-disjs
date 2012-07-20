@@ -5,8 +5,8 @@
 <body>
   <script type="text/javascript">
   
-    var remote_binary = 'https://raw.github.com/raspberrypi/firmware/blob/master/boot/bootcode.bin';
-    var remote_arch   = 'https://raw.github.com/hermanhermitage/videocoreiv/master/videocoreiv.arch';
+    //var remote_binary = 'https://raw.github.com/raspberrypi/firmware/blob/master/boot/bootcode.bin';
+    //var remote_arch   = 'https://raw.github.com/hermanhermitage/videocoreiv/master/videocoreiv.arch';
     
     var get = function(url, handler) {
   		var xhr = new XMLHttpRequest();  
@@ -51,6 +51,7 @@
       signed: {}
     }
 
+    /*
     get(remote_arch, function(){
       var e = this.response;
       log('Architecture file loaded.\n');
@@ -68,6 +69,7 @@
         elem.innerHTML = "<pre>"+dis(this.response).join("\n")+"</pre>";
       });
     });
+    */
 
     function archDefineTable(def){
       log('Table definition '+def);
@@ -314,7 +316,25 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
       return d;
     }
 
+    function loadBinary(jsonp) {
+      var meta = response.meta
+      var data = response.data
+      console.log(meta)
+      console.log(data)  	
+    }
+    
+    function loadArchitecture(jsonp) {
+    	
+    }
   </script>
+  
+  <script src='https://api.github.com/repos/raspberrypi/firmware/git/blobs/d6bbd12c3becb0517819c5afe138cffb62ad7d95?callback=loadBinary'>
+  </script>
+  <!--
+  <script src='https://api.github.com/repos/raspberrypi/firmware/git/blobs/d6bbd12c3becb0517819c5afe138cffb62ad7d95?callback=loadArchitecture'>
+  </script>
+  -->
+  
   <div id='rules'>
 <textarea rows="2" cols="20">
  (instructions)
