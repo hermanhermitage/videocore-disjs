@@ -1,4 +1,328 @@
+<!DOCTYPE html>
 <html>
-  <head></head>
-  <body>Test</body>
+<head>
+</head>
+<body>
+  <script type="text/javascript">
+  
+    var remote_binary = 'https://raw.github.com/raspberrypi/firmware/blob/master/boot/bootcode.bin';
+    var remote_arch   = 'https://raw.github.com/hermanhermitage/videocoreiv/master/videocoreiv.arch';
+    
+    var get = function(url, handler) {
+  		var xhr = new XMLHttpRequest();  
+			xhr.open("GET", url, true);  
+			// retrieve data unprocessed as a binary string  
+			xhr.overrideMimeType("text/plain; charset=x-user-defined"); 
+			xhr.onload = handler;
+			xhr.send();
+		}
+
+		var z32 = "00000000000000000000000000000000";
+    function as(i, base, width) {
+			var r = i.toString(base);
+			return z32.substring(32-width+r.length)+r;
+		}
+
+		function u8(a, i) {
+			return a.charCodeAt(i)&0xff;
+		}
+    function u16(a, i) {
+			return u8(a, i)|(u8(a, i+1)<<8);
+		}
+    function u32(a, i) {
+			return u16(a, i)||(u16(a, i+2)<<16);
+		}
+
+		var instructions = [
+//			[0x1800, 0xff00, 
+		];
+
+    var logDiv;
+    var log = function(message){
+      logDiv = logDiv || document.getElementById('log');
+      if (logDiv) {
+        logDiv.innerHTML += message + '<br>';
+      }
+    }
+
+    var arch = {
+      instructions: [],
+      tables: {},
+      signed: {}
+    }
+
+    get(remote_arch, function(){
+      var e = this.response;
+      log('Architecture file loaded.\n');
+      processArch(e);
+      
+      for(var i=0; i<arch.instructions.length; i++){
+        var inst = arch.instructions[i];
+        if ((instPrepare(inst) & 7) != 0) {
+          log('Warning: instruction found that is not an exact multiple of bytes.');
+        }
+      }
+      get(remote_binary, function(){
+        log('Binary file loaded.\n');
+        var elem = document.getElementById('dump');
+        elem.innerHTML = "<pre>"+dis(this.response).join("\n")+"</pre>";
+      });
+    });
+
+    function archDefineTable(def){
+      log('Table definition '+def);
+      var symbol = def[0];
+      var parts = def.split('[');
+      parts[1] = parts[1].split(']')[0];
+      var table = parts[1].replace(/\"/g, '').replace(/ /g,'').split(',');
+      parts[0] = parts[0].trim();//replace(/\ /g,'');
+      arch.tables[parts[0]] = table;
+      log('Table definition '+parts[0]+' is '+table.toString());
+    }
+    function archLookupTable(arch, symbol, index) {
+      return arch.tables[symbol][index];
+    }
+    function archDefineSigned(def){
+      log('Signed definition '+def);
+      arch.signed[def[0]] = true;
+    }
+    function archAddinst(pattern, action){
+      log('Added instruction '+pattern+' => '+action);
+      arch.instructions.push({pattern: pattern, action: action});
+    }
+
+    function instPrepare(inst) {
+      inst.bitlength = 0;
+      inst.masks=[]; inst.bits=[];
+      var bit = 8, bitvalue = 0, maskvalue = 0;
+      for(var i=0; i<inst.pattern.length; i++){
+        var c = inst.pattern[i];
+        if(c!=' ' && c!='\t') {
+          inst.bitlength++;
+          bitvalue = (bitvalue << 1) | (c=='1');
+          maskvalue = (maskvalue <<1) | (c=='0'||c=='1');
+          if (--bit == 0) {
+            inst.bits.push(bitvalue); inst.masks.push(maskvalue);
+            bitvalue = maskvalue = 0; bit = 8;
+          }
+        } 
+      }
+      if (bit < 8) {
+        inst.bits.push(bitvalue << bit); inst.masks.push(maskvalue << bit);
+      }
+      inst.bytelength = (inst.bitlength+7)>>3;
+      return inst.bitlength;
+    }
+
+    function instMatch(inst, bytes) {
+      for(var i=0; i<inst.bytelength; i++)  {
+        if ((bytes[i] & inst.masks[i]) != inst.bits[i])
+          return 0;
+      }
+      return 1;
+    }
+
+    //tmp hack
+    function is_signed(c) { return c=='i' || c=='o'; }
+
+    function instBind(inst, bytes) {
+      var bindings = {values:{}, lengths:{}};
+      var j=0, bit = 0, byte;
+      for (var i=0; i<inst.pattern.length; i++) {
+        var c=inst.pattern[i];
+        if (c!=' ' && c!='\t'){
+          bindings.values[c] = bindings.values[c] || 0;
+          bindings.lengths[c] = bindings.lengths[c] || 0;
+          byte = bit==0 ? bytes[j++] : byte;
+          if(bindings.lengths[c]==0 && is_signed(c) && (byte>>7))
+            bindings.values[c] = -1;
+          bindings.values[c] = (bindings.values[c]<<1) | (byte>>7);
+          bindings.lengths[c]++;
+          byte = (byte << 1)&0xff; 
+          bit = (bit+1) & 7;
+        }
+      }
+      return bindings;
+    }
+
+function is_printf_flag(c)      { return (c=='+') || (c==' ') || (c=='#') || (c=='0'); }                                                     
+function is_printf_digit(c)     { return (c>='0') && (c<='9'); }
+function is_printf_precision(c) { return (c=='.'); }       
+function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=='z') || (c=='j') || (c=='t'); }
+   
+    function instShow(inst, bindings, pc) {
+
+      var i;
+      var get_number = function() {
+        var n =0;
+        for (; is_printf_digit(inst.action[i]); i++)
+          n = n * 10 + inst.action.charCodeAt(i)-"0".charCodeAt(0);
+        return n;
+      } 
+
+      var o=[];
+      var flags, width, precision, length, type;
+      for (var i=0; i<inst.action.length; i++) {
+        var c = inst.action[i];
+        if (c=='%') { //%[parameter][flags][width][.precision][length]type
+          flags = width = precision = length = type = null;
+          i++;
+          flags = is_printf_flag(inst.action[i]) ? inst.action[i++] : 0;
+          if (is_printf_digit(inst.action[i]))
+            width = get_number();
+          if (is_printf_precision(inst.action[i])) {
+            i++;
+            precision = get_number();
+          }
+          length = is_printf_length(inst.action[i]) ? inst.action[i++] : 0;
+          type = inst.action[i];
+        }
+        else if (c=='{') {
+          // evaluate expression up to }
+          // and then print according to fmt
+          var fmt="";
+          for (var j=++i;inst.action[i]!='}'; i++) {
+            /*
+            if(inst.action[i]>='a' && inst.action[i]<='z' || inst.action[i]=='$') {
+              //fmt += inst.action[i]+':'+bindings.values[inst.action[i]];
+              fmt += bindings.values[inst.action[i]];
+            } else {
+              fmt += inst.action[i];
+            }*/
+           } 
+          fmt=inst.action.substring(j, i);
+          with(bindings.values) {
+            fmt=eval(fmt);
+          }
+          o.push(fmt.toString(type=='x'?16:10));
+        }
+        else {
+          o.push(c);
+        }
+      }
+      return o.join('');
+    }
+    
+    function archFindinst(arch, ws) {
+      for (var i=0; i<arch.instructions.length; i++) {
+        var inst = arch.instructions[i];
+        if (instMatch(inst, ws[inst.bytelength/2-1]))
+          return inst;
+      }
+    }
+
+    function ws(e, i) {
+      return [
+        [u8(e, i+1), u8(e, i+0)],
+        [u8(e, i+1), u8(e, i+0), u8(e, i+3), u8(e, i+2)],
+        [u8(e, i+1), u8(e, i+0), u8(e, i+5), u8(e, i+4), u8(e, i+3), u8(e, i+2)],
+        [u8(e, i+1), u8(e, i+0), u8(e, i+7), u8(e, i+6), u8(e, i+5), u8(e, i+4), u8(e, i+3), u8(e, i+2)],
+        [u8(e, i+1), u8(e, i+0), u8(e, i+9), u8(e, i+8), u8(e, i+7), u8(e, i+6), u8(e, i+5), u8(e, i+4), u8(e, i+3), u8(e, i+2)],
+      ];
+    }
+    
+    function processArch(arch){
+      var lines = arch.split('\n');
+      for (var i=0; i<lines.length; i++) {
+        var pattern;
+        for (var j=0; j<lines[i].length; j++) {
+          var c = lines[i][j];
+          if (c==' ' || c=='\t') {
+            continue;
+          }
+          else if (c=='#' || c=='\n' || c=='\r') {
+            break;
+          }
+          else if (lines[i].indexOf('(define-table', j)==j) {
+            archDefineTable(lines[i].substring(j+14));
+            break;
+          }
+          else if (lines[i].indexOf('(define-signed', j)==j) {
+            archDefineSigned(lines[i].substring(j+15));
+            break;
+          }
+          else if (c=='"') {
+            // Scan closing quote
+            var end = lines[i].indexOf('"', j+1);
+            if (end<0) {
+              log('Missing closing " on line '+(i+1)+'.');
+              break;
+            }
+            archAddinst(pattern, lines[i].substring(j+1, end));
+            break;
+          }
+          else {
+            var k=j;
+            for (; ; j++) {
+              c = lines[i][j];
+              if (c!=' ' && c!='\t' && (c<'a' || c>'z') && c!='0' && c!='1' && c!='!' && c!='?')
+                break;
+            }
+            pattern = lines[i].substring(k, j);
+            //log('pattern is '+pattern+' '+k+'..'+j);
+            j--;
+          }
+        }
+      }
+    }
+
+    function dc(c) {
+      return (c>=32 && c<=126) ? String.fromCharCode(c) : '.';
+    }
+
+    function dis2(arch, e, i, d){
+      var l=[];
+			l.push(as(i, 16, 8)+": "+as(u16(e, i), 2, 16)+": ");
+
+      var bytes = ws(e, i);
+      var inst = archFindinst(arch, bytes);
+      if (inst) {
+        for(var j=0; j<3; j++)
+          if (j<inst.bytelength)
+            l.push(dc(u8(e, i+j)));
+          else
+            l.push(' ');
+        l.push(" :");
+        for (var j=0; j<3; j++)
+          if (j<inst.bytelength/2)
+            l.push(as(u16(e, i+2*j), 16, 4)+' ');
+          else
+            l.push('     ');
+
+        var bindings = instBind(inst, bytes[inst.bytelength/2-1]);
+        for (var j=32; j<128; j++) {
+          var c = String.fromCharCode(j);
+          if (bindings.lengths[c]>0 && arch.tables[c]) {
+            bindings.values[c] = archLookupTable(arch, c, bindings.values[c]);
+          }
+          bindings.values['$'] = i;
+        }
+        l.push(instShow(inst, bindings, i));
+      }
+
+      d.push(l.join(''));
+      return inst.bytelength;
+
+    return inst.bytelength;
+    }
+
+    function dis(memory){
+      var d = [];
+      for (var a=0; a<memory.length; ){
+        a+=dis2(arch, memory, a, d);
+      } 
+      return d;
+    }
+
+  </script>
+  <div id='rules'>
+<textarea rows="2" cols="20">
+ (instructions)
+</textarea>
+	</div>
+  <div id='dump'>
+  </div>
+  <div id='log'>
+  </div>
+</body>
 </html>
