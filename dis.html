@@ -321,12 +321,12 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     
     function loadBinary(jsonp) {
       console.log('Binary loaded');
-      binary = jsonp.data.content;
+      binary = window.atob(jsonp.data.content.replace(/\s/g,''));
     }
     
     function loadArchitecture(jsonp) {
       console.log('Architecture loaded');
-      architecture = jsonp.data.content;
+      architecture = window.atob(jsonp.data.content.replace(/\s/g,''));
     }
   </script>
   
@@ -340,7 +340,7 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
   <!--
   -->
   
-  <script src='https://api.github.com/repos/raspberrypi/firmware/git/blobs/d6bbd12c3becb0517819c5afe138cffb62ad7d95?callback=loadArchitecture'>
+  <script src='https://api.github.com/repos/hermanhermitage/videocoreiv/contents/videocoreiv.arch?callback=loadArchitecture'>
   </script>
   
   
