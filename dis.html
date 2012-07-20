@@ -196,6 +196,8 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
           with(bindings.values) {
             fmt=eval(fmt);
           }
+          if (type=='x')
+            fmt=(fmt&0xffffffff);
           o.push(fmt.toString(type=='x'?16:10));
         }
         else {
