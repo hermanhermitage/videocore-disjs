@@ -1,3 +1,3 @@
 Javascript VideoCore IV Disassembler
 
-see: hermanhermitage.github.com/videocore-disjs
+see: http://hermanhermitage.github.com/videocore-disjs
