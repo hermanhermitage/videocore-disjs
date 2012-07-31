@@ -281,7 +281,7 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
       var bytes = ws(e, i);
       var inst = archFindinst(arch, bytes);
       if (inst) {
-        for(var j=0; j<3; j++)
+        for(var j=0; j<10; j++)
           if (j<inst.bytelength)
             l.push(dc(u8(e, i+j)));
           else
