@@ -287,7 +287,7 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
           else
             l.push(' ');
         l.push(" :");
-        for (var j=0; j<3; j++)
+        for (var j=0; j<5; j++)
           if (j<inst.bytelength/2)
             l.push(as(u16(e, i+2*j), 16, 4)+' ');
           else
