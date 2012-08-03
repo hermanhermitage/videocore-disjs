@@ -369,11 +369,11 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
   <!--
   Instruction: https://api.github.com/repos/ <input type="text" size="60" name="archUrl" value="hermanhermitage/videocoreiv/contents/videocoreiv.arch"/> or   <input type="file" id="input" onchange="handleFiles(this.files)"> <br/>
   -->
-<b>VideoCore IV Disassembler</b> by <a href='mailto:hermanhermitage@hotmail.com'>Herman Hermitage</a>.
+<b>VideoCore IV Disassembler</b> by <a href='mailto:hermanhermitage@hotmail.com'>Herman Hermitage</a>.<br>
 Please choose a binary to diassemble:
 <ul>
-<li>Either https://api.github.com/repos/ <input type="text" size="60" name="binaryUrl" value="raspberrypi/firmware/contents/boot/bootcode.bin"/> <input type="submit" value="Go" onclick='loadGithubJsonp("raspberrypi/firmware/contents/boot/bootcode.bin", "loadBinary")'/></li>
-<li>or choose a local file <input type="file" id="input" onchange="handleFiles(this.files)"></li>
+<li><input type="submit" value="Load from Github" onclick='loadGithubJsonp("raspberrypi/firmware/contents/boot/bootcode.bin", "loadBinary")'/>Either https://api.github.com/repos/ <input type="text" size="60" name="binaryUrl" value="raspberrypi/firmware/contents/boot/bootcode.bin"/></li>
+<li><input value="Local File" type="file" id="input" onchange="handleFiles(this.files)"></li>
 </ul>
 
 <script>
