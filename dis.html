@@ -340,16 +340,7 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
         }
       }
     }
-  </script>
-  
-  <!--
-  Instruction: https://api.github.com/repos/ <input type="text" size="60" name="archUrl" value="hermanhermitage/videocoreiv/contents/videocoreiv.arch"/> or   <input type="file" id="input" onchange="handleFiles(this.files)"> <br/>
-  -->
 
-  Binary/Exe:  https://api.github.com/repos/ <input type="text" size="60" name="binaryUrl" value="raspberrypi/firmware/contents/boot/bootcode.bin"/> <input type="submit" value="Go" onclick='loadGithubJsonp("raspberrypi/firmware/contents/boot/bootcode.bin", "loadBinary")'/>
-  <br> or Choose a local file <input type="file" id="input" onchange="handleFiles(this.files)">
-
-<script>
   function handleFiles(files){
     for (var i=0; i<files.length; i++)
       var file = files[i];
@@ -372,7 +363,20 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
   function loadGithubJsonp(fileGithubPath, callbackFunctionName){
     loadScript('https://api.github.com/repos/'+fileGithubPath+'?callback='+callbackFunctionName)
   }
+	
+  </script>
+  
+  <!--
+  Instruction: https://api.github.com/repos/ <input type="text" size="60" name="archUrl" value="hermanhermitage/videocoreiv/contents/videocoreiv.arch"/> or   <input type="file" id="input" onchange="handleFiles(this.files)"> <br/>
+  -->
+<b>VideoCore IV Disassembler</b> by <a href='mailto:hermanhermitage@hotmail.com'>Herman Hermitage</a>.
+Please choose a binary to diassemble:
+<ul>
+<li>Either https://api.github.com/repos/ <input type="text" size="60" name="binaryUrl" value="raspberrypi/firmware/contents/boot/bootcode.bin"/> <input type="submit" value="Go" onclick='loadGithubJsonp("raspberrypi/firmware/contents/boot/bootcode.bin", "loadBinary")'/></li>
+<li>or choose a local file <input type="file" id="input" onchange="handleFiles(this.files)"></li>
+</ul>
 
+<script>
 </script>
 <div><pre id='file'></pre></div>
   <b>CPU Instruction Decoding Rules</b>    
