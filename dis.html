@@ -373,11 +373,11 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
 A simple disassembler for the Broadcom Cpu in the RaspberryPi.<br>
 <br>
 <b>Binary:</b><br>
-<input type="submit" value="Load" onclick='loadGithubJsonp(document.getElementById("binaryUrl").value)', "loadBinary")/>
+<input type="submit" value="Load" onclick='loadGithubJsonp(document.getElementById("binaryUrl").value, "loadBinary"')/>
  https://api.github.com/repos/
    <select id='binaryUrl'>
-     <option value="raspberrypi/firmware/contents/boot/bootcode.bin">bootcode.bin</option>
-     <option value="raspberrypi/firmware/contents/boot/loader.bin">loader.bin</option>
+     <option value="raspberrypi/firmware/contents/boot/bootcode.bin">raspberrypi/firmware/contents/boot/bootcode.bin</option>
+     <option value="raspberrypi/firmware/contents/boot/loader.bin">raspberrypi/firmware/contents/boot/loader.bin</option>
    </select>
    , or <input value="Local File" type="file" id="input" onchange="handleFiles(this.files)">
 <script>
