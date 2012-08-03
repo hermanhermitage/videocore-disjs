@@ -361,6 +361,18 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
   }
 
   function loadGithubJsonp(fileGithubPath, callbackFunctionName){
+    if (fileGithubPath.indexOf('raspberrypi/firmware')==0) {
+    	var message = [
+    	  'The file you wish to diassemble is contained in the raspberrypi github repo at https://github.com/raspberrypi.',
+    	  'Since May 10 2012, these have been accompanied by a LICENSE.broadcom file at https://github.com/raspberrypi/firmware/blob/4a16242d6ea7a6e7dc6d5153ee6e05d068fe7df9/boot/LICENCE.broadcom.',
+    	  'Before you proceed please read and understand the agreement.  By clicking OK below you acknowledge you have read and understood ',
+    	  'the agreement.  You also acknowledge that you understand a github API will be used to retrieve a transformed version of the file in non binary form,',
+    	  'furthermore you acknowledge you understand that javascript code running on your browser will then further translate the JSONP encoded binary,',
+    	  'into a further modified form.  Furthermore you acknowledge that you understand the RaspberryPi foundation knowingly placed the files on github,'
+    	  'where they would be subject to githubs redistribution terms.'
+    	  ];
+    	confirm(message.join());
+    }
     loadScript('https://api.github.com/repos/'+fileGithubPath+'?callback='+callbackFunctionName)
   }
 	
