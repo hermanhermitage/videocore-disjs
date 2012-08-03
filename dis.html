@@ -326,7 +326,7 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
       binary = window.atob(jsonp.data.content.replace(/\s/g,''));
       log('Binary file loaded.\n');
       var elem = document.getElementById('dump');
-      elem.innerHTML = "<pre>"+dis(binary).join("\n")+"</pre>";  
+      elem.innerText = "<pre>"+dis(binary).join("\n")+"</pre>";  
     }
     
     function loadArchitecture(jsonp) {
