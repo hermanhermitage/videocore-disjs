@@ -30,12 +30,9 @@
 			return u8(a, i)|(u8(a, i+1)<<8);
 		}
     function u32(a, i) {
-			return u16(a, i)||(u16(a, i+2)<<16);
+			//return u16(a, i)|((u16(a, i+2)<<16));
+      return (u16(a, i)|(u16(a, i+2) << 16))>>>0;
 		}
-
-		var instructions = [
-//			[0x1800, 0xff00, 
-		];
 
     var logDiv;
     var log = function(message){
@@ -345,16 +342,45 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     }
   </script>
   
-  Instruction: https://api.github.com/repos/ <input type="text" size="60" name="archUrl" value="hermanhermitage/videocoreiv/contents/videocoreiv.arch"/><br />
-  Binary/Exe:  https://api.github.com/repos/ <input type="text" size="60" name="binaryUrl" value="raspberrypi/firmware/contents/boot/bootcode.bin"/>
+  <!--
+  Instruction: https://api.github.com/repos/ <input type="text" size="60" name="archUrl" value="hermanhermitage/videocoreiv/contents/videocoreiv.arch"/> or   <input type="file" id="input" onchange="handleFiles(this.files)"> <br/>
+  -->
 
-  <h1>CPU Instruction Decoding Rules</h1>    
+  Binary/Exe:  https://api.github.com/repos/ <input type="text" size="60" name="binaryUrl" value="raspberrypi/firmware/contents/boot/bootcode.bin"/> <input type="submit" value="Go" onclick='loadGithubJsonp("raspberrypi/firmware/contents/boot/bootcode.bin", "loadBinary")'/>
+  <br> or Choose a local file <input type="file" id="input" onchange="handleFiles(this.files)">
+
+<script>
+  function handleFiles(files){
+    for (var i=0; i<files.length; i++)
+      var file = files[i];
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var contents = this.result;
+        document.getElementById('dump').innerText = dis(contents).join('\n');
+      }
+      reader.readAsBinaryString(file);
+  }
+
+  function loadScript(src){
+    var head= document.getElementsByTagName('head')[0];
+    var script= document.createElement('script');
+    script.type= 'text/javascript';
+    script.src= src;
+    head.appendChild(script);
+  }
+
+  function loadGithubJsonp(fileGithubPath, callbackFunctionName){
+    loadScript('https://api.github.com/repos/'+fileGithubPath+'?callback='+callbackFunctionName)
+  }
+
+</script>
+<div><pre id='file'></pre></div>
+  <b>CPU Instruction Decoding Rules</b>    
   <div id='rules'>
   </div>
-  <h1>File Disassembly</h1>
+  <b>File Disassembly</b>
   <div>
-  	<pre id='dump'>
-  	</pre>
+  	<textarea id='dump' style='font-family: monospace'></textarea>
   </div>
   <h1>Log</h1>
   <div id='log'>
@@ -364,8 +390,10 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
   </script>
   
   <!--<script src='https://api.github.com/repos/raspberrypi/firmware/git/blobs/d6bbd12c3becb0517819c5afe138cffb62ad7d95?callback=loadBinary'>-->
+  <!--
   <script src='https://api.github.com/repos/raspberrypi/firmware/contents/boot/bootcode.bin?callback=loadBinary'>
   </script>
-  
+  -->
+
 </body>
 </html>
