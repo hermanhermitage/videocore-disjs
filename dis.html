@@ -327,7 +327,7 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     }
     
     function loadArchitecture(jsonp) {
-      console.log('Architecture loaded');
+      log('Architecture loaded');
       architecture = window.atob(jsonp.data.content.replace(/\s/g,''));
       var e = architecture;
       log('Architecture file loaded.\n');
