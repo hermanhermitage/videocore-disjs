@@ -361,7 +361,8 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
   }
 
   function loadGithubJsonp(fileGithubPath, callbackFunctionName){
-    if (fileGithubPath.indexOf('raspberrypi/firmware')==0) {
+    var confirmed = true;
+     if (fileGithubPath.indexOf('raspberrypi/firmware')==0) {
     	var message = [
     	  'The file you wish to diassemble is contained in the raspberrypi github repo at '+
     	  'https://github.com/raspberrypi.',
@@ -376,7 +377,7 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     	  'placed the files on Github, where they would be subject to Githubs '+
     	  'redistribution terms and transformative APIs as required for the normal functioning of Github services.',
     	  'You acknowledge you are not using this tool for any activities relating to "circumvention" (in the DMCA sense), '+
-    	  'but are using it for the purpose of "interoperability".'
+    	  'but are using it for the purpose of "interoperability".',
     	  'Finally you acknowledge that '+
     	  'the author of this program is in no way responsible for your actions and you will personally indemnify '+
     	  'the author from any and all damages arising from or relating to your use of this tool.',
@@ -384,9 +385,10 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     	  'If you do not agree or do not understand, do NOT proceed.  Click "Cancel" (or the equivalent declining '+
     	  'button in your browser) and close the related browser window.'
     	  ];
-    	confirm(message.join('\n\n'));
+    	confirmed = confirm(message.join('\n\n'));
     }
-    loadScript('https://api.github.com/repos/'+fileGithubPath+'?callback='+callbackFunctionName)
+    if (confirmed)
+      loadScript('https://api.github.com/repos/'+fileGithubPath+'?callback='+callbackFunctionName)
   }
 	
   </script>
