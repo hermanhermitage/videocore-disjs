@@ -366,20 +366,23 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     	  'The file you wish to diassemble is contained in the raspberrypi github repo at '+
     	  'https://github.com/raspberrypi.',
     	  'Since May 10 2012, these have been accompanied by a LICENSE.broadcom file at '+
-    	  'https://github.com/raspberrypi/firmware/blob/4a16242d6ea7a6e7dc6d5153ee6e05d068fe7df9/boot/LICENCE.broadcom.',
-    	  'Before you proceed please read and understand the agreement.  By clicking OK '+
-    	  'below you acknowledge you have read and understood the agreement.',
-    	  'You also acknowledge that you understand a Github API will be used to retrieve a transformed version of the file in non binary form,',
-    	  'furthermore you acknowledge you understand that javascript code running in your '+
-    	  'browser will then further translate the JSONP encoded binary into a further modified ("diassembled") form.',
-    	  'Furthermore you acknowledge that you understand the RaspberryPi foundation '+
+    	  'https://github.com/raspberrypi/firmware/blob/master/boot/LICENCE.broadcom.',
+    	  'Before you proceed please read and understand the Broadcom license.',
+    	  'You also acknowledge that you understand a Github API will be used to retrieve a '+
+    	  'transformed version of the file in non binary form from the raspberrypi repo.',
+    	  'You acknowledge that you understand that javascript code running in your browser will then '+
+    	  'translate the JSONP encoded binary into a further modified ("diassembled") form.',
+    	  'Furthermore you acknowledge that you understand the Github user raspberrypi '+
     	  'knowingly placed the files on Github, where they would be subject to Github\'s '+
-    	  'redistribution terms and exposure to transform via Github\'s API.'+
+    	  'redistribution terms and transformative APIs in the due course of the normal function of Github''s services.'+
     	  'Finally you acknowledge that yourself, Github and RaspberryPi may be in breach of Broadcom\'s license '+
     	  'but the author of this program is in no way responsible for your actions and you will personally indemnify '+
-    	  'them from any damages relating to your use of this tool.'
+    	  'the author from any and all damages arising from or relating to your use of this tool.',
+    	  'By clicking OK below you acknowledge you have read, understood and agree to both this agreement. '+
+    	  'If you do not agree or do not understand, do NOT proceed.  Click "Cancel" (or the equivalent negative '+
+    	  'button in your browser and close the related browser window.'
     	  ];
-    	confirm(message.join('\n'));
+    	confirm(message.join('\n\n'));
     }
     loadScript('https://api.github.com/repos/'+fileGithubPath+'?callback='+callbackFunctionName)
   }
