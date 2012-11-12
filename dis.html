@@ -385,9 +385,8 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     	  'If you do not agree or do not understand, do NOT proceed.  Click "Cancel" (or the equivalent declining '+
     	  'button in your browser) and close the related browser window.'
     	  ];
-    	  message = ['We apologize but the ability to disassemble the chosen binary has been temporarily disabled.'];
-    	confirmed = false;
-    	confirm(message.join('\n\n'));
+    	  //message = ['We apologize but the ability to disassemble the chosen binary has been temporarily disabled.'];
+    	confirmed = confirm(message.join('\n\n'));
     }
     if (confirmed)
       loadScript('https://api.github.com/repos/'+fileGithubPath+'?callback='+callbackFunctionName)
@@ -407,11 +406,12 @@ A simple disassembler for the Broadcom Cpu in the RaspberryPi (only tested in Go
 <input type="submit" value="Load" onclick='loadGithubJsonp(document.getElementById("binaryUrl").value, "loadBinary")'/>
  https://api.github.com/repos/
    <select id='binaryUrl'>
-     <option value="hermanhermitage/videocoreiv/contents/blinker01/blinker01.bin">hermanhermitage/videocoreiv/xontents/blinker01/blinker01.bin</option>
+     <option value="hermanhermitage/videocoreiv/contents/blinker01/blinker01.bin">hermanhermitage/videocoreiv/contents/blinker01/blinker01.bin</option>
      <option value="hermanhermitage/videocoreiv/contents/uart01/uart01.bin">hermanhermitage/videocoreiv/contents/master/uart01/uart01.bin</option>
      <option value="hermanhermitage/videocoreiv/contents/uart02/uart02.bin">hermanhermitage/videocoreiv/contents/master/uart02/uart02.bin</option>
      <option value="raspberrypi/firmware/contents/boot/bootcode.bin">raspberrypi/firmware/contents/boot/bootcode.bin</option>
-     <option value="raspberrypi/firmware/contents/boot/loader.bin">raspberrypi/firmware/contents/boot/loader.bin</option>
+     <option value="raspberrypi/firmware/contents/boot/start_cd.elf">raspberrypi/firmware/contents/boot/start_cd.elf</option>
+     <!-- <option value="raspberrypi/firmware/contents/boot/loader.bin">raspberrypi/firmware/contents/boot/loader.bin</option> -->
 </select>
    , or <input value="Local File" type="file" id="input" onchange="handleFiles(this.files)">
 <script>
