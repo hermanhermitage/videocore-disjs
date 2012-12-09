@@ -256,7 +256,7 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
             var k=j;
             for (; ; j++) {
               c = lines[i][j];
-              if (c!=' ' && c!='\t' && (c<'a' || c>'z') && c!='0' && c!='1' && c!='!' && c!='?')
+              if (c!=' ' && c!='\t' && (c<'A' || c>'Z') && (c<'a' || c>'z') && c!='0' && c!='1' && c!='!' && c!='?')
                 break;
             }
             pattern = lines[i].substring(k, j);
