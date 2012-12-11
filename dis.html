@@ -69,6 +69,7 @@
     */
 
     function archDefineTable(def){
+      def = def.slice(0,-1);
       log('Table definition '+def);
       var symbol = def[0];
       var parts = def.split('[');
@@ -82,6 +83,7 @@
       return arch.tables[symbol][index];
     }
     function archDefineSigned(def){
+      def = def.slice(0,-1);
       log('Signed definition '+def);
       arch.signed[def[0]] = true;
     }
@@ -225,7 +227,7 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     function processArch(arch){
       var lines = arch.split('\n');
       for (var i=0; i<lines.length; i++) {
-        var pattern;
+        var pattern = '';
         for (var j=0; j<lines[i].length; j++) {
           var c = lines[i][j];
           if (c==' ' || c=='\t') {
@@ -254,12 +256,31 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
           }
           else {
             var k=j;
-            for (; ; j++) {
+            for (; ;) {
               c = lines[i][j];
-              if (c!=' ' && c!='\t' && (c<'A' || c>'Z') && (c<'a' || c>'z') && c!='0' && c!='1' && c!='!' && c!='?')
+              if (c==' ' || c=='\t') {
+		j++;
+	      }
+              else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c=='0' || c=='1' || c=='!' || c=='?') {
+                pattern = pattern + c;
+	        j++;
+              }
+	      else if (c == ':') {
+                j++;
+                var num = 0;
+                while (lines[i][j] >= '0' && lines[i][j] <= '9') {
+		  num = (num * 10) + (lines[i][j] - '0');
+		  j++;
+                }
+		c = pattern[pattern.length - 1];
+		while (num-- > 1) {
+		  pattern = pattern + c;
+		}
+              }
+              else {
                 break;
+              }
             }
-            pattern = lines[i].substring(k, j);
             //log('pattern is '+pattern+' '+k+'..'+j);
             j--;
           }
@@ -302,9 +323,10 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
       }
 
       d.push(l.join(''));
-      return inst.bytelength;
-
-    return inst.bytelength;
+      if (inst) {
+        return inst.bytelength;
+      }
+      return 2;
     }
 
     function dis(memory){
@@ -315,12 +337,9 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
       return d;
     }
 
-    var binary;
-    var architecture;
-    
     function loadBinary(jsonp) {
       console.log('Binary loaded');
-      binary = window.atob(jsonp.data.content.replace(/\s/g,''));
+      var binary = window.atob(jsonp.data.content.replace(/\s/g,''));
       log('Binary file loaded.\n');
       var elem = document.getElementById('dump');
       elem.value = dis(binary).join("\n");  
@@ -328,7 +347,7 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
     
     function loadArchitecture(jsonp) {
       log('Architecture loaded');
-      architecture = window.atob(jsonp.data.content.replace(/\s/g,''));
+      var architecture = window.atob(jsonp.data.content.replace(/\s/g,''));
       var e = architecture;
       log('Architecture file loaded.\n');
       processArch(e);
@@ -419,9 +438,14 @@ A simple disassembler for the Broadcom Cpu in the RaspberryPi (only tested in Go
 <div><pre id='file'></pre></div>
   <b>Disassembly</b>
   <div><textarea id='dump' style='font-family: monospace' rows=24 cols=132></textarea></div>
-  <b>Log</b>    
+  <b>Log</b>
+  <code>
   <div id='log'></div>
-  
+  </code>
+
+  <!-- swap this line with the one below to try o:10 format LHS's
+  <script src='https://api.github.com/repos/mm120/binutils-vc4/contents/libvc4/videocoreiv.arch?ref=vc4;callback=loadArchitecture'>
+  -->
   <script src='https://api.github.com/repos/hermanhermitage/videocoreiv/contents/videocoreiv.arch?callback=loadArchitecture'>
   </script>
   
