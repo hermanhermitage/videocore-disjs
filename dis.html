@@ -244,6 +244,10 @@ function is_printf_length(c)    { return (c=='h') || (c=='l') || (c=='L') || (c=
             archDefineSigned(lines[i].substring(j+15));
             break;
           }
+          else if (lines[i].indexOf('(set-byte-order', j)==j) {
+            //todo: implement custom byte orders
+            break;
+          }
           else if (c=='"') {
             // Scan closing quote
             var end = lines[i].indexOf('"', j+1);
