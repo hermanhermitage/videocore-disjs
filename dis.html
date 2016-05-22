@@ -78,7 +78,7 @@
       var quoted_items = def.substring(def.indexOf("[")+1, def.lastIndexOf("]")).match(/"[^"]*"/g);
       // Strip the quotes off each entry
       var table = quoted_items.map(function(x){return x.substring(1,x.length-1)});
-      arch.tables[symbol = table;
+      arch.tables[symbol] = table;
       log('Table definition '+symbol+' is '+table.toString());
     }
     function archLookupTable(arch, symbol, index) {
