@@ -69,15 +69,17 @@
     */
 
     function archDefineTable(def){
+      // def: T [ "i0", "i1", ..., "in" ]
       def = def.slice(0,-1);
       log('Table definition '+def);
+      // Table name is the first char
       var symbol = def[0];
-      var parts = def.split('[');
-      parts[1] = parts[1].split(']')[0];
-      var table = parts[1].replace(/\"/g, '').replace(/ /g,'').split(',');
-      parts[0] = parts[0].trim();//replace(/\ /g,'');
-      arch.tables[parts[0]] = table;
-      log('Table definition '+parts[0]+' is '+table.toString());
+      // Get array of quoted string elements
+      var quoted_items = def.substring(def.indexOf("[")+1, def.lastIndexOf("]")).match(/"[^"]*"/g);
+      // Strip the quotes off each entry
+      var table = quoted_items.map(function(x){return x.substring(1,x.length-1)});
+      arch.tables[symbol = table;
+      log('Table definition '+symbol+' is '+table.toString());
     }
     function archLookupTable(arch, symbol, index) {
       return arch.tables[symbol][index];
