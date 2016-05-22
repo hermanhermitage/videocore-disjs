@@ -75,7 +75,7 @@
       // Table name is the first char
       var symbol = def[0];
       // Get array of quoted string elements
-      var quoted_items = def.substring(def.indexOf("[")+1, def.lastIndexOf("]")).match(/"[^"]*"/g);
+      var quoted_items = def.match(/"[^"]*"/g);
       // Strip the quotes off each entry
       var table = quoted_items.map(function(x){return x.substring(1,x.length-1)});
       arch.tables[symbol] = table;
